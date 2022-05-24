@@ -19,6 +19,7 @@
 
 package com.baidu.hugegraph.util.collection;
 
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import com.baidu.hugegraph.HugeException;
@@ -29,10 +30,10 @@ public class SingleThreadObjectIntMapping<V> implements ObjectIntMapping<V> {
     private static final int MAGIC = 1 << 16;
     private static final int MAX_OFFSET = 10;
 
-    private final IntObjectHashMap<V> int2IdMap;
+    private final MutableIntObjectMap<V> int2IdMap;
 
     public SingleThreadObjectIntMapping() {
-        this.int2IdMap = new IntObjectHashMap<>();
+        this.int2IdMap = new IntObjectHashMap<V>().asSynchronized();
     }
 
     @Watched

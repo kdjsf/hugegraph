@@ -19,12 +19,6 @@
 
 package com.baidu.hugegraph.traversal.algorithm.records;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-
 import com.baidu.hugegraph.backend.id.Id;
 import com.baidu.hugegraph.traversal.algorithm.HugeTraverser.PathSet;
 import com.baidu.hugegraph.traversal.algorithm.records.record.IntIterator;
@@ -32,6 +26,12 @@ import com.baidu.hugegraph.traversal.algorithm.records.record.Record;
 import com.baidu.hugegraph.traversal.algorithm.records.record.RecordType;
 import com.baidu.hugegraph.type.define.CollectionType;
 import com.baidu.hugegraph.util.collection.CollectionFactory;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 public class KneighborRecords extends SingleWayMultiPathsRecords {
 
@@ -96,11 +96,14 @@ public class KneighborRecords extends SingleWayMultiPathsRecords {
         for (int i = 1; i < records.size(); i++) {
             IntIterator iterator = records.get(i).keys();
             while ((limit > 0L) && iterator.hasNext()) {
-                addEdgeToCodePair(codePairs, i, iterator.next());
-                limit--;
+                synchronized (iterator) {
+                    if ((limit > 0L) && iterator.hasNext()) {
+                        addEdgeToCodePair(codePairs, i, iterator.next());
+                        limit--;
+                    }
+                }
             }
         }
-
         filterEdges(codePairs);
     }
 }

@@ -72,8 +72,7 @@ public abstract class SingleWayMultiPathsRecords extends AbstractRecords {
         this.records = new Stack<>();
         this.records.push(firstRecord);
 
-        this.accessedVertices = concurrent ? new IntHashSet().asSynchronized() :
-                                new IntHashSet();
+        this.accessedVertices =  new IntHashSet().asSynchronized();
     }
 
     public SingleWayMultiPathsRecords(RecordType type, boolean concurrent,

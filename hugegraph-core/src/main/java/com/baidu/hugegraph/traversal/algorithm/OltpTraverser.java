@@ -142,18 +142,18 @@ public abstract class OltpTraverser extends HugeTraverser
     }
 
     protected <K> long traverseBatch(Iterator<CIter<K>> iterator, Consumer<CIter<K>> consumer,
-                                String name, int queueWorkerSize) {
+                                     String name, int queueWorkerSize) {
         if (!iterator.hasNext()) {
             return 0L;
         }
 
         Consumers<CIter<K>> consumers = new Consumers<>(executors.getExecutor(),
-                consumer, null, queueWorkerSize);
+                                                        consumer, null, queueWorkerSize);
         consumers.start(name);
         long total = 0L;
         try {
             while (iterator.hasNext()) {
-//                this.edgeIterCounter++;
+                //                this.edgeIterCounter++;
                 total++;
                 CIter<K> v = iterator.next();
                 consumers.provide(v);
@@ -169,13 +169,17 @@ public abstract class OltpTraverser extends HugeTraverser
                 throw Consumers.wrapException(e);
             } finally {
                 executors.returnExecutor(consumers.executor());
-                iterator.forEachRemaining(it -> {
-                    try {
-                        it.close();
-                    } catch (Exception ex) {
-                        LOG.warn("Exception when closing CIter", ex);
+                if (iterator.hasNext()){
+                    synchronized (iterator){
+                        iterator.forEachRemaining(it -> {
+                            try {
+                                it.close();
+                            } catch (Exception ex) {
+                                LOG.warn("Exception when closing CIter", ex);
+                            }
+                        });
                     }
-                });
+                }
                 CloseableIterator.closeIterator(iterator);
             }
         }
